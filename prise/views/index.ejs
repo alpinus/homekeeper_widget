@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		工程预算计算器
+	</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta charset="utf-8">
+	<link rel="stylesheet" href="http://cdn.amazeui.org/amazeui/2.7.2/css/amazeui.css"/>
+  <style type="text/css">
+    html {font-size:10px}
+    @media screen and (min-width:480px) and (max-width:639px) {
+        html {
+            font-size: 10px
+        }
+    }
+     
+    @media screen and (min-width:640px) and (max-width:719px) {
+        html {
+            font-size: 15px
+        }
+    }
+     
+    @media screen and (min-width:720px) and (max-width:749px) {
+        html {
+            font-size: 18px
+        }
+    }
+     
+    @media screen and (min-width:750px) and (max-width:799px) {
+        html {
+            font-size: 20px
+        }
+    }
+     
+    @media screen and (min-width:800px) and (max-width:959px) {
+        html {
+            font-size: 20px
+        }
+    }
+     
+    @media screen and (min-width:960px) and (max-width:1079px) {
+        html {
+            font-size: 25px
+        }
+    }
+     
+    @media screen and (min-width:1080px) {
+        html {
+            font-size: 27px
+        }
+    }
+    td{
+      border: 1px solid #ccc;
+    }
+    .input_txt{
+      width: 100%;
+    }
+  </style>
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <script type="text/javascript" src="/javascripts/jquery.PrintArea.js"></script>
+  <script type="text/javascript">
+    function init(){
+      $(".input_txt").val(0);
+      $(".input_txt").css(
+        "text-align","right"
+      );
+      var temp_value=0;
+      var select_div;
+      $("td").delegate(".input_txt","focus",function(){
+        //alert("select")
+        temp_value=$(this).val();
+        $(this).val("");
+        sum();
+      })
+      $("td").delegate(".input_txt","keyup",function(){
+        temp_value=$(this).val();
+        //alert(temp_value)
+        //select_div=$(this).parent();
+        //subtotal_txt=select_div.find(".subtotal_txt");
+        //subtotal_txt.val("sdfdsf");
+        sum();
+      })
+      $("td").delegate(".input_txt","change",function(){
+        //alert("out"+temp_value)
+        select_div=$(this).parent().parent().find(".subtotal_txt");
+        console.log(select_div.html());
+        //subtotal_txt=select_div.find(".subtotal_txt");
+        //subtotal_txt.val("sdfdsf");
+        sum();
+      })
+    }
+    function sum(){
+      var total=0;
+      $("#prise_talbe tr").each(function(){
+        var input_num=$(this).find(".input_txt").val();
+        var rate=$(this).find(".rate").html();
+        var prise=0;
+        if(typeof(rate) == "undefined"){
+          prise=0;
+        }else{
+          prise=input_num*rate;
+        }
+       
+        total+=prise;
+      }
+      );
+      $("#result_txt").html("总价："+total);
+    }
+    function print(){
+      var text_content="打印内容："+$("#result_txt").html();
+      //var a=$("#myPrintArea").printArea(); 
+      $.ajax({
+        type:"POST",
+        url:"print",
+        contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+        data:{text:text_content},
+        dataType:"json",
+        success:function(data){
+          alert("发送成功");
+        }
+      }
+
+      );
+    }
+  </script>
+</head>
+<body onload="init()">
+	  <header data-am-widget="header"
+          class="am-header am-header-default">
+      <div class="am-header-left am-header-nav">
+          <a href="#left-link" class="">
+                <i class="am-header-icon am-icon-home"></i>
+          </a>
+      </div>
+
+      <h1 class="am-header-title">
+          <a href="#title-link" class="">
+            价格计算器
+          </a>
+      </h1>
+
+      <div class="am-header-right am-header-nav">
+          <a href="#right-link" class="">
+                <i class="am-header-icon am-icon-bars"></i>
+          </a>
+      </div>
+  </header>
+  <div>
+  	<div data-am-widget="list_news" class="am-list-news am-list-news-default" >
+  <!--列表标题-->
+    <div class="am-list-news-hd am-cf">
+       <!--带更多链接-->
+        <a href="###" class="">
+          <h2>基础施工项目</h2>
+        </a>
+          </div>
+
+	  <div class="am-list-news-bd">
+		  <!--ul class="am-list">
+		      <li class="am-g">
+		          <p>拆门</p><input type="input"/><p>个</p>
+		      </li>
+		  </ul-->
+      <button onclick="print()">打印</button>
+      <div id="myPrintArea">
+      <table id="prise_talbe" style="width: 100%;margin:0 auto">
+        <tr>
+          <th width="15%">项目</th>
+          <th width="20%">数目</th>
+          <th width="10%">单位</th>
+          <th width="30%"></th>
+          <th width="25%">小计</th>
+        <tr>
+        <tr>
+          <td>拆门</td>
+          <td>
+            <input type="input" class="input_txt" name=""/><p class="rate" hidden>50</p>
+          </td>
+          <td>个</td>
+          <td>人工费50</td>
+          <td><p class="subtotal_txt"></p></td>
+        </tr>
+        <tr>
+          <td>拆墙</td>
+          <td>
+            <input type="input" class="input_txt" name=""/><p class="rate" hidden >25</p></td>
+          <td>平米</td>
+          <td>人工费25</td>
+          <td><p class="subtotal_txt"></p></td>
+        </tr>
+      </table>
+       <div id="result">
+         <p id="result_txt"></p>
+       </div>
+     </div>
+  </div>
+</body>
+</html>
